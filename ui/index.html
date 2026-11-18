@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Corsair Control</title>
+<link rel="icon" type="image/png" sizes="256x256" href="icon.png">
+<link rel="icon" href="icon.ico" sizes="any">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <img src="icon.png" alt="" width="28" height="28">
+  <h1>Corsair Control</h1>
+  <nav role="tablist">
+    <button role="tab" data-tab="keyboard" aria-selected="true">Keyboard <span class="dot" id="kbDot"></span></button>
+    <button role="tab" data-tab="headset" aria-selected="false">Headset <span class="dot" id="hsDot"></span></button>
+    <button role="tab" data-tab="sound" aria-selected="false">Sound</button>
+  </nav>
+  <div id="link" class="link">Connecting…</div>
+  <label class="startup" title="Starts the app in the background when you sign in to Windows, so your settings apply without opening it"><input type="checkbox" id="startup" class="switch"> Start with Windows</label>
+  <button id="quit" class="small" title="Stops the app and hands both devices back to their built-in settings">Quit app</button>
+</header>
+
+<main>
+<section id="tab-keyboard" class="tab">
+  <div class="status" id="kbStatus"></div>
+
+  <div class="card">
+    <h2>How the app works with the keyboard</h2>
+    <div class="modes" id="controlModes">
+      <button data-control="self">Keyboard runs itself<small>Side screen pictures, Fn + arrows and every Fn shortcut work as built in.</small><small>Lights come from the app. Dial modes and button jobs are saved into the keyboard, and game mode is kept off.</small></button>
+      <button data-control="full">App takes full control<small>The app reacts to every key itself, and Fn lights up its shortcut keys.</small><small>The side screen shows only its base image and Fn + arrows do nothing.</small></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="board-wrap"><div id="board" class="board" aria-label="Keyboard map"></div></div>
+    <p class="hint" id="boardHint"></p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Lighting</h2>
+      <div class="seg" id="effects"></div>
+      <div class="row" id="rowColor"><label for="color" id="colorLabel">Colour</label><input type="color" id="color"><div class="swatches" data-for="color"></div></div>
+      <div class="row" id="rowColor2"><label for="color2" id="color2Label">Second colour</label><input type="color" id="color2"><div class="swatches" data-for="color2"></div></div>
+      <div class="row" id="rowPaint">
+        <label for="paint">Paint colour</label><input type="color" id="paint" value="#ff2bd6"><div class="swatches" data-for="paint"></div>
+        <button id="fillAll" class="small">Fill all keys</button><button id="clearKeys" class="small">Reset keys</button>
+      </div>
+      <div class="row" id="rowSpeed"><label for="speed">Speed</label><input type="range" id="speed" min="0" max="100"><output id="speedOut"></output></div>
+      <div class="row"><label for="brightness">Brightness</label><input type="range" id="brightness" min="0" max="100" step="5"><output id="brightnessOut"></output></div>
+      <div class="row"><label for="fnColor">Fn shortcut colour</label><input type="color" id="fnColor"><div class="swatches" data-for="fnColor"></div></div>
+      <p class="hint">While you hold Fn, every light goes off except the keys that have an Fn shortcut and any buttons you have given a job. This only happens when the app takes full control.</p>
+    </div>
+
+    <div class="card">
+      <h2>Dial</h2>
+      <p class="hint">Pick what the dial does. Turning and pressing it both follow the mode.</p>
+      <p class="hint needs-full">Choosing a mode saves it into the keyboard (the lights pause for a second). Fn + F12 still steps through the keyboard's other built-in modes.</p>
+      <div class="modes" id="dialModes"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Buttons</h2>
+    <p class="hint">Game mode is switched off while this app is running. The Game Mode button does nothing unless you give it a job here.</p>
+    <p class="hint needs-full">Jobs are saved into the keyboard. Media controls and shortcuts then work even when this app is closed; the other jobs need the app running.</p>
+    <div id="buttons" class="buttons"></div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Side screen</h2>
+      <p class="hint">Pictures are saved in the keyboard itself. Click one to show it; the first slot is the keyboard's own built-in display.</p>
+      <div id="slots" class="slots"></div>
+      <div class="row">
+        <button id="addPic" class="small">Add picture…</button>
+        <input type="file" id="picFile" accept="image/png,image/jpeg,image/webp,image/bmp" hidden>
+        <span id="screenMsg" class="hint" role="status"></span>
+      </div>
+      <p class="hint">Pictures are cropped to fill the 248 × 170 picture area. Animated GIFs are not supported yet.</p>
+    </div>
+    <div class="card">
+      <h2>Response rate</h2>
+      <div class="row">
+        <label for="polling">Polling rate</label>
+        <select id="polling">
+          <option value="">Leave as it is</option>
+          <option value="4">1000 Hz</option><option value="5">2000 Hz</option>
+          <option value="6">4000 Hz</option><option value="7">8000 Hz</option>
+        </select>
+        <button id="applyPolling" class="small">Apply</button>
+      </div>
+      <p class="hint">The keyboard disconnects for a few seconds when this changes.</p>
+    </div>
+  </div>
+</section>
+
+<section id="tab-headset" class="tab" hidden>
+  <div class="status" id="hsStatus"></div>
+  <div class="grid">
+    <div class="card">
+      <h2>Sound</h2>
+      <div class="row"><label for="vol">Volume</label><input type="range" id="vol" min="0" max="100"><output id="volOut"></output><button id="volMute" class="small toggle"></button></div>
+      <div class="row"><label for="mic">Mic level</label><input type="range" id="mic" min="0" max="100"><output id="micOut"></output><button id="micMute" class="small toggle"></button></div>
+      <p class="hint" id="audioHint"></p>
+      <div class="row"><label for="follow">Flip-up mic mutes in Windows</label><input type="checkbox" id="follow" class="switch"></div>
+    </div>
+    <div class="card">
+      <h2>Sidetone</h2>
+      <p class="hint">Hear your own voice in the headset while you talk.</p>
+      <div class="row"><label for="stOn">Sidetone</label><input type="checkbox" id="stOn" class="switch"></div>
+      <div class="row"><label for="stLevel">Level</label><input type="range" id="stLevel" min="0" max="100" step="5"><output id="stOut"></output></div>
+    </div>
+    <div class="card">
+      <h2>Lighting</h2>
+      <div class="row"><label for="hsOn">Lights</label><input type="checkbox" id="hsOn" class="switch"></div>
+      <div class="row"><label for="hsTop">Top</label><input type="color" id="hsTop"><div class="swatches" data-for="hsTop"></div></div>
+      <div class="row"><label for="hsBottom">Bottom</label><input type="color" id="hsBottom"><div class="swatches" data-for="hsBottom"></div></div>
+      <div class="row"><label for="hsBright">Brightness</label><input type="range" id="hsBright" min="5" max="100" step="5"><output id="hsBrightOut"></output></div>
+      <button id="matchKb" class="small">Match keyboard colour</button>
+    </div>
+    <div class="card">
+      <h2>Power</h2>
+      <div class="row">
+        <label for="sleep">Switch off when idle</label>
+        <select id="sleep">
+          <option value="0">Never</option><option value="1">After 1 minute</option><option value="5">After 5 minutes</option>
+          <option value="10">After 10 minutes</option><option value="15">After 15 minutes</option>
+          <option value="30">After 30 minutes</option><option value="60">After 1 hour</option>
+        </select>
+      </div>
+      <h2 class="gap">Equaliser</h2>
+      <p class="hint">Not supported yet. The headset has no equaliser of its own; iCUE did this inside Windows.</p>
+    </div>
+  </div>
+</section>
+<section id="tab-sound" class="tab" hidden>
+  <div class="card">
+    <h2>Sound mode</h2>
+    <p class="hint">One click sets the headset volume, mic level, sidetone and how loud each kind of app is. New apps that start making sound are set to match.</p>
+    <div class="seg" id="soundModes"></div>
+    <div id="modeEditor" hidden>
+      <h2 class="gap" id="modeTitle"></h2>
+      <div class="grid2">
+        <div>
+          <div class="row"><label for="mVolume">Headset volume</label><input type="range" id="mVolume" min="0" max="100"><output id="mVolumeOut"></output></div>
+          <div class="row"><label for="mMic">Mic level</label><input type="range" id="mMic" min="0" max="100"><output id="mMicOut"></output></div>
+          <div class="row"><label for="mSide">Sidetone</label><input type="checkbox" id="mSide" class="switch"><input type="range" id="mSideLevel" min="0" max="100" step="5" aria-label="Sidetone level"><output id="mSideOut"></output></div>
+        </div>
+        <div id="modeLevels"></div>
+      </div>
+      <p class="hint">Changes are kept in this mode.</p>
+    </div>
+    <h2 class="gap" id="eqTitle">Tone</h2>
+    <p class="hint" id="eqStatus"></p>
+    <div class="eq" id="eq"></div>
+    <div class="row"><button id="eqFlat" class="small">Reset to flat</button></div>
+  </div>
+  <div class="card">
+    <h2>Mixer</h2>
+    <p class="hint" id="mixHint"></p>
+    <div class="row"><label for="mixVol">Headset</label><input type="range" id="mixVol" min="0" max="100"><output id="mixVolOut"></output><button id="mixVolMute" class="small toggle"></button></div>
+    <div class="row"><label for="mixMic">Microphone</label><input type="range" id="mixMic" min="0" max="100"><output id="mixMicOut"></output><button id="mixMicMute" class="small toggle"></button></div>
+    <h2 class="gap">Apps</h2>
+    <div id="apps"></div>
+  </div>
+</section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
